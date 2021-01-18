@@ -20,7 +20,7 @@
  * import { Database, Resource } from '@admin-bro/typeorm';
  * import AdminBro from 'admin-bro'
  *
- * AdminBro.registerAdapter(TypeOrmAdapter);
+ * AdminBro.registerAdapter({ Database, Resource });
  *
  * //...
  * ```
