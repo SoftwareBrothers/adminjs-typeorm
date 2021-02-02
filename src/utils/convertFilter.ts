@@ -1,4 +1,4 @@
-import {BaseEntity, FindConditions, Between, MoreThanOrEqual, LessThanOrEqual, Like, MoreThan, LessThan} from 'typeorm'
+import { BaseEntity, FindConditions, Between, MoreThanOrEqual, LessThanOrEqual, Like, MoreThan, LessThan } from 'typeorm'
 import { Filter } from 'admin-bro'
 import { Property } from '../Property'
 
@@ -34,21 +34,21 @@ export function convertFilter(filter?: Filter): FindConditions<BaseEntity> {
         where[n] = Between(Number(value), Number(value2))
       } else {
         switch (inequalitySign) {
-          case '>=':
-            where[n] = MoreThanOrEqual(Number(value))
-            break
-          case '<=':
-            where[n] = LessThanOrEqual(Number(value))
-            break
-          case '>':
-            where[n] = MoreThan(Number(value))
-            break
-          case '<':
-            where[n] = LessThan(Number(value))
-            break
-          default:
-            where[n] = Number(value)
-            break
+        case '>=':
+          where[n] = MoreThanOrEqual(Number(value))
+          break
+        case '<=':
+          where[n] = LessThanOrEqual(Number(value))
+          break
+        case '>':
+          where[n] = MoreThan(Number(value))
+          break
+        case '<':
+          where[n] = LessThan(Number(value))
+          break
+        default:
+          where[n] = Number(value)
+          break
         }
       }
     } else if (['boolean', 'object', 'array'].includes(one.property.type())) {
