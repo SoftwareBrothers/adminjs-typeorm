@@ -1,4 +1,4 @@
-import { BaseEntity, FindConditions, Between, MoreThanOrEqual, LessThanOrEqual, Like } from 'typeorm'
+import {BaseEntity, FindConditions, Between, MoreThanOrEqual, LessThanOrEqual, Like, MoreThan, LessThan} from 'typeorm'
 import { Filter } from 'admin-bro'
 import { Property } from '../Property'
 
@@ -10,6 +10,15 @@ function safeParseJSON(json: string) {
   }
 }
 
+function safeParseNumber(str: string): (string | undefined)[] {
+  const result = str.match(/([<=>]{1,2})?\s*?([\d]+[.]?[\d]*)(\s*?(~)\s*?([\d]+[.]?[\d]*))?/)
+
+  if (result === null) {
+    return new Array(5)
+  }
+  return result
+}
+
 export function convertFilter(filter?: Filter): FindConditions<BaseEntity> {
   if (!filter) return {}
 
@@ -17,7 +26,32 @@ export function convertFilter(filter?: Filter): FindConditions<BaseEntity> {
   const where = {}
   for (const n in filters) {
     const one = filters[n]
-    if (['boolean', 'number', 'float', 'object', 'array'].includes(one.property.type())) {
+    if (['number', 'float'].includes(one.property.type())) {
+      const [, inequalitySign, value, , betweenSign, value2] = safeParseNumber(one.value as string)
+      if (safeParseJSON(value as string) === null) {
+        where[n] = null
+      } else if (betweenSign) {
+        where[n] = Between(Number(value), Number(value2))
+      } else {
+        switch (inequalitySign) {
+          case '>=':
+            where[n] = MoreThanOrEqual(Number(value))
+            break
+          case '<=':
+            where[n] = LessThanOrEqual(Number(value))
+            break
+          case '>':
+            where[n] = MoreThan(Number(value))
+            break
+          case '<':
+            where[n] = LessThan(Number(value))
+            break
+          default:
+            where[n] = Number(value)
+            break
+        }
+      }
+    } else if (['boolean', 'object', 'array'].includes(one.property.type())) {
       where[n] = safeParseJSON(one.value as string)
     } else if (['date', 'datetime'].includes(one.property.type())) {
       if (typeof one.value !== 'string' && one.value.from && one.value.to) where[n] = Between(new Date(one.value.from), new Date(one.value.to))
