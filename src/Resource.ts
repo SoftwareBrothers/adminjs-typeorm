@@ -136,10 +136,15 @@ export class Resource extends BaseResource {
       let param
       let applyTransformation
       if (property.column.isArray) {
-        applyTransformation = <T>(transformFun: (v: T) => any) => (array: T[]) => array.map(transformFun)
+        applyTransformation = <T>(transformation: (v: T) => any) => (array: T[]) => {
+          if (!Array.isArray(array)) {
+            throw Error(`Expected params[${key}] to be an array. Received ${String(array)}`)
+          }
+          return array.map(transformation)
+        }
         param = preparedParams[key]
       } else {
-        applyTransformation = <T>(transformFun: (v: T) => any) => (val: T) => transformFun(val)
+        applyTransformation = <T>(transformation: (v: T) => any) => (val: T) => transformation(val)
         param = flat.get(preparedParams, key)
       }
 
