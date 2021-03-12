@@ -3,6 +3,7 @@ import { BaseRecord, BaseResource, Filter, flat, ValidationError } from 'admin-b
 import { BaseEntity } from 'typeorm'
 import { Property } from './Property'
 import { convertFilter } from './utils/convertFilter'
+import { reconstructPostArrays } from './utils/reconstructPostArrays'
 
 type ParamsType = Record<string, any>;
 
@@ -128,52 +129,35 @@ export class Resource extends BaseResource {
 
   /** Converts params from string to final type */
   private prepareParams(params: Record<string, any>): Record<string, any> {
-    console.log('  params', params)
-    const preparedParams: Record<string, any> = { ...params }
-    const paramKeys = Object.keys(params)
+    const preparedParams = reconstructPostArrays(params)
     this.properties().forEach((property) => {
-      const propertyPath = property.path()
-      console.log('  propertyPath', propertyPath)
       const key = property.path()
 
       let param
-      let transformValue
+      let applyTransformation
       if (property.column.isArray) {
-        transformValue = <T>(transformFun: (v: T) => any) => (array: T[]) => array.map(transformFun)
-        const regexp = new RegExp(`^${propertyPath}\\.(\\d+)$`)
-        for (const paramKey of paramKeys) {
-          const match = paramKey.match(regexp)
-          if (match) {
-            if (!param) {
-              param = []
-            }
-            const positionInArray = +match[1]
-            param[positionInArray] = preparedParams[paramKey]
-            delete preparedParams[paramKey]
-          }
-        }
+        applyTransformation = <T>(transformFun: (v: T) => any) => (array: T[]) => array.map(transformFun)
+        param = preparedParams[key]
       } else {
-        transformValue = <T>(transformFun: (v: T) => any) => (val: T) => transformFun(val)
-        param = flat.get(preparedParams, propertyPath)
+        applyTransformation = <T>(transformFun: (v: T) => any) => (val: T) => transformFun(val)
+        param = flat.get(preparedParams, key)
       }
-      console.log('  param', param)
 
       // eslint-disable-next-line no-continue
       if (param === undefined) { return }
 
       const type = property.type()
-      console.log('  type', type)
 
       if (type === 'mixed') {
-        preparedParams[key] = transformValue((v: any) => v)(param)
+        preparedParams[key] = param
       }
 
       if (type === 'number') {
-        preparedParams[key] = transformValue(Number)(param)
+        preparedParams[key] = applyTransformation(Number)(param)
       }
 
       if (type === 'string') {
-        preparedParams[key] = transformValue(String)(param)
+        preparedParams[key] = applyTransformation(String)(param)
       }
 
       if (type === 'reference') {
@@ -186,9 +170,10 @@ export class Resource extends BaseResource {
           // { post: { id: 1 } }
           id: (property.column.type === Number) ? Number(p) : p,
         })
-
         if (property.column.isArray) {
-          paramValue = transformValue(transformation)(param)
+          paramValue = param
+            .map((val: any) => transformation(val))
+            .filter((val: any) => val !== null)
         } else if (param === null) {
           paramValue = null
         } else {
@@ -197,7 +182,6 @@ export class Resource extends BaseResource {
         preparedParams[property.column.propertyName] = paramValue
       }
     })
-    console.log('  preparedParams', preparedParams)
     return preparedParams
   }
 
