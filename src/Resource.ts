@@ -137,8 +137,11 @@ export class Resource extends BaseResource {
       let applyTransformation
       if (property.column.isArray) {
         applyTransformation = <T>(transformation: (v: T) => any) => (array: T[]) => {
+          if (array === null || array === undefined) {
+            return array
+          }
           if (!Array.isArray(array)) {
-            throw Error(`Expected params[${key}] to be an array. Received ${String(array)}`)
+            throw Error(`Expected params["${key}"] to be an array. Received ${String(array)}`)
           }
           return array.map(transformation)
         }
