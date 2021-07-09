@@ -1,5 +1,5 @@
 import { ColumnMetadata } from 'typeorm/metadata/ColumnMetadata'
-import { BaseProperty, PropertyType } from 'admin-bro'
+import { BaseProperty, PropertyType } from 'adminjs'
 import { DATA_TYPES } from './utils/data-types'
 
 export class Property extends BaseProperty {
@@ -8,8 +8,7 @@ export class Property extends BaseProperty {
   private columnPosition: number;
 
   constructor(column: ColumnMetadata, columnPosition = 0) {
-    // for reference fields take database name (with ...Id)
-    const path = column.referencedColumn ? column.databaseName : column.propertyPath
+    const path = column.propertyPath
     super({ path })
     this.column = column
     this.columnPosition = columnPosition
@@ -60,5 +59,9 @@ export class Property extends BaseProperty {
     if (!type) { console.warn(`Unhandled type: ${this.column.type}`) }
 
     return type
+  }
+
+  public isArray(): boolean {
+    return this.column.isArray
   }
 }

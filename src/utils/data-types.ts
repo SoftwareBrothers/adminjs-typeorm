@@ -1,4 +1,4 @@
-import { PropertyType } from 'admin-bro'
+import { PropertyType } from 'adminjs'
 
 export type DataType = 'string' | 'number' | 'float' | 'datetime' | 'date'
   | 'array' | 'object' | 'boolean';
@@ -43,7 +43,7 @@ const DATE = [
   // WithPrecisionColumnType:
   'datetime', 'datetime2', 'datetimeoffset', 'time', 'time with time zone',
   'time without time zone', 'timestamp', 'timestamp without time zone',
-  'timestamp with time zone', 'timestamp with local time zone',
+  'timestamp with time zone', 'timestamp with local time zone', 'timestamptz',
 
   // SimpleColumnType:
   'timestamp with local time zone', 'smalldatetime', 'date',
