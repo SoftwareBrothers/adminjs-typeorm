@@ -1,5 +1,5 @@
 import { expect } from 'chai'
-import { BaseProperty, BaseRecord, ValidationError, Filter } from 'admin-bro'
+import { BaseProperty, BaseRecord, ValidationError, Filter } from 'adminjs'
 import { validate } from 'class-validator'
 
 import { Car } from './entities/Car'
@@ -68,21 +68,43 @@ describe('Resource', () => {
 
   describe('#properties', () => {
     it('returns all the properties', () => {
-      expect(resource.properties()).to.have.lengthOf(12)
+      expect(resource.properties()).to.have.lengthOf(13)
     })
 
     it('returns all properties with the correct position', () => {
       expect(resource.properties().map((property) => property.position())).to.deep.equal([
-        0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11,
+        0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12,
       ])
     })
   })
 
   describe('#property', () => {
     it('returns selected property', () => {
-      const property = resource.property('id')
+      const property = resource.property('carId')
 
       expect(property).to.be.an.instanceOf(BaseProperty)
+    })
+  })
+
+  describe('#find', () => {
+    beforeEach(async () => {
+      await resource.create(data)
+      await resource.create({ ...data, name: 'other' })
+    })
+
+    it('returns all record when no query', async () => {
+      const filter = new Filter({}, resource)
+      return expect(await resource.find(filter, { sort: { sortBy: 'name' } })).to.have.lengthOf(2)
+    })
+
+    it('returns matched record when filter is provided', async () => {
+      const filter = new Filter({ name: 'other' }, resource)
+      return expect(await resource.find(filter, { sort: { sortBy: 'name' } })).to.have.lengthOf(1)
+    })
+
+    it('returns no records when filter does not match', async () => {
+      const filter = new Filter({ name: 'others' }, resource)
+      return expect(await resource.find(filter, { sort: { sortBy: 'name' } })).to.have.lengthOf(0)
     })
   })
 
@@ -111,26 +133,26 @@ describe('Resource', () => {
       const params = await resource.create(data)
 
       // eslint-disable-next-line no-unused-expressions
-      expect(params.id).not.to.be.undefined
+      expect(params.carId).not.to.be.undefined
     })
 
     it('stores Column with defined name property', async () => {
       const params = await resource.create(data)
-      const storedRecord = await Car.findOne(params.id) as Car
+      const storedRecord = await Car.findOne(params.carId) as Car
 
       expect(storedRecord.streetNumber).to.equal(data.streetNumber)
     })
 
     it('stores number Column with property as string', async () => {
       const params = await resource.create(data)
-      const storedRecord = await Car.findOne(params.id) as Car
+      const storedRecord = await Car.findOne(params.carId) as Car
 
       expect(storedRecord.stringAge).to.equal(4)
     })
 
     it('stores mixed type properties', async () => {
       const params = await resource.create(data)
-      const storedRecord = await Car.findOne(params.id) as Car
+      const storedRecord = await Car.findOne(params.carId) as Car
 
       expect(storedRecord.meta).to.deep.equal({
         title: data['meta.title'],
@@ -186,7 +208,7 @@ describe('Resource', () => {
         age: 4,
         stringAge: '4',
       })
-      record = await resource.findOne(params.id)
+      record = await resource.findOne(params.carId)
     })
 
     it('updates record name', async () => {
@@ -233,10 +255,10 @@ describe('Resource', () => {
     it('creates new resource with uuid', async () => {
       carParams = await resource.create({
         ...data,
-        carBuyerId: carBuyer.id,
+        carBuyerId: carBuyer.carBuyerId,
       })
 
-      expect(carParams.carBuyerId).to.equal(carBuyer.id)
+      expect(carParams.carBuyerId).to.equal(carBuyer.carBuyerId)
     })
   })
 
@@ -251,12 +273,12 @@ describe('Resource', () => {
     })
 
     afterEach(async () => {
-      await Car.delete(carParams.id)
+      await Car.delete(carParams.carId)
       await CarDealer.delete(carDealer)
     })
 
     it('deletes the resource', async () => {
-      await resource.delete(carParams.id)
+      await resource.delete(carParams.carId)
       expect(await resource.count({} as Filter)).to.eq(0)
     })
 

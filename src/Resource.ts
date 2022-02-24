@@ -1,9 +1,10 @@
 /* eslint-disable no-param-reassign */
 import { BaseEntity } from 'typeorm'
-import { BaseResource, ValidationError, Filter, BaseRecord, flat } from 'admin-bro'
+import { BaseResource, ValidationError, Filter, BaseRecord, flat } from 'adminjs'
 
 import { Property } from './Property'
-import { convertFilter } from './utils/convertFilter'
+import { convertFilter } from './utils/filter/filter.converter'
+import safeParseNumber from './utils/safe-parse-number'
 
 type ParamsType = Record<string, any>;
 
@@ -92,7 +93,7 @@ export class Resource extends BaseResource {
   public async update(pk: string | number, params: any = {}): Promise<ParamsType> {
     const instance = await this.model.findOne(pk)
     if (instance) {
-      const preparedParams = this.prepareParams(params)
+      const preparedParams = flat.unflatten<any, any>(this.prepareParams(params))
       Object.keys(preparedParams).forEach((paramName) => {
         instance[paramName] = preparedParams[paramName]
       })
@@ -145,23 +146,26 @@ export class Resource extends BaseResource {
       }
 
       if (type === 'number') {
-        preparedParams[key] = Number(param)
+        if (property.isArray()) {
+          preparedParams[key] = param ? param.map((p) => safeParseNumber(p)) : param
+        } else {
+          preparedParams[key] = safeParseNumber(param)
+        }
       }
 
       if (type === 'reference') {
         if (param === null) {
           preparedParams[property.column.propertyName] = null
         } else {
-          // references cannot be stored as an IDs in typeorm, so in order to mimic this) and
-          // not fetching reference resource) change this:
-          // { postId: "1" }
-          // to that:
-          // { post: { id: 1 } }
+          const [ref, foreignKey] = property.column.propertyPath.split('.')
           const id = (property.column.type === Number) ? Number(param) : param
-          preparedParams[property.column.propertyName] = { id }
+          preparedParams[ref] = foreignKey ? {
+            [foreignKey]: id,
+          } : id
         }
       }
     })
+
     return preparedParams
   }
 

@@ -1,4 +1,4 @@
-import { PropertyType } from 'admin-bro'
+import { PropertyType } from 'adminjs'
 
 export type DataType = 'string' | 'number' | 'float' | 'datetime' | 'date'
   | 'array' | 'object' | 'boolean';
@@ -6,16 +6,19 @@ export type DataType = 'string' | 'number' | 'float' | 'datetime' | 'date'
 const NUMBER = [
   // PrimaryGeneratedColumnType:
   'int', 'int2', 'int4', 'int8', 'integer', 'tinyint', 'smallint',
-  'mediumint', 'bigint', 'dec', 'decimal', 'fixed', 'numeric', 'number',
+  'mediumint', 'dec', 'decimal', 'fixed', 'numeric', 'number',
 
   // WithWidthColumnType:
-  'tinyint', 'smallint', 'mediumint', 'int', 'bigint',
+  'tinyint', 'smallint', 'mediumint', 'int',
 
   // SimpleColumnType:
   'int2', 'integer', 'int4', 'int8', 'int64', 'unsigned big int', 'float4', 'float8',
 ]
 
 const STRING = [
+  // PrimaryGeneratedColumnType
+  'bigint',
+
   // SpatialColumnType:
   'geometry', 'geography',
 
@@ -43,7 +46,7 @@ const DATE = [
   // WithPrecisionColumnType:
   'datetime', 'datetime2', 'datetimeoffset', 'time', 'time with time zone',
   'time without time zone', 'timestamp', 'timestamp without time zone',
-  'timestamp with time zone', 'timestamp with local time zone',
+  'timestamp with time zone', 'timestamp with local time zone', 'timestamptz',
 
   // SimpleColumnType:
   'timestamp with local time zone', 'smalldatetime', 'date',
