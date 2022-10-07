@@ -1,3 +1,4 @@
+import { BigintParser } from './bigint-filter.parser'
 import { CustomParser } from './custom-filter.parser'
 import { DateParser } from './date-filter.parser'
 import { EnumParser } from './enum-filter.parser'
@@ -15,6 +16,7 @@ export const safeParseJSON = (json: string): any | null => {
 export const parsers = [
   // Has to be the first one, as it is intended to use custom filter if user overrides that
   CustomParser,
+  BigintParser,
   DateParser,
   EnumParser,
   ReferenceParser,
