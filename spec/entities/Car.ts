@@ -1,6 +1,6 @@
 import {
   Entity, Column, PrimaryGeneratedColumn, BaseEntity, ManyToOne,
-  JoinColumn, UpdateDateColumn, CreateDateColumn, RelationId,
+  JoinColumn, UpdateDateColumn, CreateDateColumn, RelationId, DeleteDateColumn,
 } from 'typeorm'
 import { IsDefined, Min, Max } from 'class-validator'
 import { CarDealer } from './CarDealer'
@@ -74,4 +74,7 @@ export class Car extends BaseEntity {
 
   @UpdateDateColumn({ name: 'updated_at' })
   public updatedAt: Date;
+
+  @DeleteDateColumn({ name: 'deleted_at' })
+  public deletedAt: Date;
 }
