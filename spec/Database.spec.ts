@@ -22,7 +22,7 @@ describe('Database', () => {
 
   describe('#resources', () => {
     it('returns all entities', async () => {
-      expect(new Database(dataSource).resources()).to.have.lengthOf(3)
+      expect(new Database(dataSource).resources()).to.have.lengthOf(4)
     })
   })
 })

@@ -8,6 +8,7 @@ import { dataSource } from './utils/test-data-source'
 
 import { Resource } from '../src/Resource'
 import { CarBuyer } from './entities/CarBuyer'
+import { CarWithDeleted } from './entities/CarWithDeleted'
 
 describe('Resource', () => {
   let resource: Resource
@@ -68,12 +69,12 @@ describe('Resource', () => {
 
   describe('#properties', () => {
     it('returns all the properties', () => {
-      expect(resource.properties()).to.have.lengthOf(12)
+      expect(resource.properties()).to.have.lengthOf(13)
     })
 
     it('returns all properties with the correct position', () => {
       expect(resource.properties().map((property) => property.position())).to.deep.equal([
-        0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11,
+        0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12,
       ])
     })
   })
@@ -298,6 +299,49 @@ describe('Resource', () => {
         expect(baseError && baseError.type).to.equal('QueryFailedError')
         expect(baseError && baseError.message).not.to.equal(null)
       }
+    })
+  })
+
+  describe("when model's withDeleted property is true", () => {
+    let softDeletedEntity: Car
+    let record: BaseRecord|null = null
+
+    beforeEach(async () => {
+      resource = new Resource(CarWithDeleted)
+      softDeletedEntity = await resource.create(data) as Car
+      record = await resource.findOne(softDeletedEntity.carId)
+      await Car.softRemove(softDeletedEntity as Car)
+    })
+
+    afterEach(async () => {
+      await Car.delete({})
+    })
+
+    describe('#find', () => {
+      it('returns soft deleted resource', async () => {
+        const filter = new Filter({}, resource)
+        return expect(await resource.find(filter, { sort: { sortBy: 'name' } })).to.have.lengthOf(1)
+      })
+    })
+
+    describe('#update', () => {
+      it('updates record name', async () => {
+        const ford = 'Ford'
+        await resource.update((record && record.id()) as string, {
+          name: ford,
+        })
+        const recordInDb = await resource.findOne((record && record.id()) as string)
+
+        expect(recordInDb && recordInDb.get('name')).to.equal(ford)
+      })
+    })
+
+    describe('#delete', () => {
+      it('deletes the resource', async () => {
+        expect(await resource.count({} as Filter)).to.eq(1)
+        await resource.delete(softDeletedEntity.carId)
+        expect(await resource.count({} as Filter)).to.eq(0)
+      })
     })
   })
 })

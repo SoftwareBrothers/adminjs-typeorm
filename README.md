@@ -88,6 +88,26 @@ export class Person extends BaseEntity
 
 Admin supports ManyToOne relationship but you also have to define @RealationId as stated in the example above.
 
+## Get soft deleted entities
+
+Sometimes you might want to find entities that soft deleted. You can extend the existing entity with `withDeleted` property:
+
+```
+@Entity()
+export class Person extends BaseEntity {
+  @DeleteDateColumn()
+  deletedAt: Date|null;
+}
+
+// admin person model
+@Entity('person')
+export class AdminPagePerson extends Person {
+  static withDeleted = true
+}
+```
+
+You can pass `AdminPagePerson` to the resource configuration to include soft deleted entities in the query builder.
+
 ## Contribution
 
 ### Running the example app

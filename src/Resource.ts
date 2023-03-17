@@ -8,18 +8,28 @@ import safeParseNumber from './utils/safe-parse-number'
 
 type ParamsType = Record<string, any>;
 
+type ModelType = typeof BaseEntity & {
+  withDeleted?: (() => boolean) | boolean;
+}
+
 export class Resource extends BaseResource {
   public static validate: any;
 
-  private model: typeof BaseEntity;
+  private model: ModelType;
 
   private propsObject: Record<string, Property> = {};
 
-  constructor(model: typeof BaseEntity) {
+  private withDeleted = false
+
+  constructor(model: ModelType) {
     super(model)
 
     this.model = model
     this.propsObject = this.prepareProps()
+
+    this.withDeleted = typeof this.model.withDeleted === 'function'
+      ? !!this.model.withDeleted()
+      : !!this.model.withDeleted
   }
 
   public databaseName(): string {
@@ -53,6 +63,7 @@ export class Resource extends BaseResource {
   public async count(filter: Filter): Promise<number> {
     return this.model.count(({
       where: convertFilter(filter),
+      withDeleted: this.withDeleted
     }))
   }
 
@@ -70,6 +81,7 @@ export class Resource extends BaseResource {
       order: {
         [sortBy]: (direction || 'asc').toUpperCase(),
       },
+      withDeleted: this.withDeleted,
     })
     return instances.map((instance) => new BaseRecord(instance, this))
   }
@@ -78,7 +90,7 @@ export class Resource extends BaseResource {
     const reference: any = {}
     reference[this.idName()] = id
 
-    const instance = await this.model.findOneBy(reference)
+    const instance = await this.model.findOne({ where: reference, withDeleted: this.withDeleted })
     if (!instance) {
       return null
     }
@@ -88,7 +100,7 @@ export class Resource extends BaseResource {
   public async findMany(ids: Array<string | number>): Promise<Array<BaseRecord>> {
     const reference: any = {}
     reference[this.idName()] = In(ids)
-    const instances = await this.model.findBy(reference)
+    const instances = await this.model.find({ where: reference, withDeleted: this.withDeleted })
 
     return instances.map((instance) => new BaseRecord(instance, this))
   }
@@ -104,7 +116,7 @@ export class Resource extends BaseResource {
   public async update(pk: string | number, params: any = {}): Promise<ParamsType> {
     const reference: any = {}
     reference[this.idName()] = pk
-    const instance = await this.model.findOneBy(reference)
+    const instance = await this.model.findOne({ where: reference, withDeleted: this.withDeleted })
     if (instance) {
       const preparedParams = flat.unflatten<any, any>(this.prepareParams(params))
       Object.keys(preparedParams).forEach((paramName) => {
@@ -120,7 +132,7 @@ export class Resource extends BaseResource {
     const reference: any = {}
     reference[this.idName()] = pk
     try {
-      const instance = await this.model.findOneBy(reference)
+      const instance = await this.model.findOne({ where: reference, withDeleted: this.withDeleted })
       if (instance) {
         await instance.remove()
       }
