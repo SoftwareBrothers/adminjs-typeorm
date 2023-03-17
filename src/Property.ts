@@ -5,7 +5,7 @@ import { DATA_TYPES } from './utils/data-types'
 export class Property extends BaseProperty {
   public column: ColumnMetadata;
 
-  private columnPosition: number;
+  protected columnPosition: number;
 
   constructor(column: ColumnMetadata, columnPosition = 0) {
     const path = column.propertyPath

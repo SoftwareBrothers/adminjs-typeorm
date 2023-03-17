@@ -11,9 +11,9 @@ type ParamsType = Record<string, any>;
 export class Resource extends BaseResource {
   public static validate: any;
 
-  private model: typeof BaseEntity;
+  protected model: typeof BaseEntity;
 
-  private propsObject: Record<string, Property> = {};
+  protected propsObject: Record<string, Property> = {};
 
   constructor(model: typeof BaseEntity) {
     super(model)
@@ -135,7 +135,7 @@ export class Resource extends BaseResource {
     }
   }
 
-  private prepareProps() {
+  protected prepareProps() {
     const { columns } = this.model.getRepository().metadata
     return columns.reduce((memo, col, index) => {
       const property = new Property(col, index)
@@ -147,7 +147,7 @@ export class Resource extends BaseResource {
   }
 
   /** Converts params from string to final type */
-  private prepareParams(params: Record<string, any>): Record<string, any> {
+  protected prepareParams(params: Record<string, any>): Record<string, any> {
     const preparedParams: Record<string, any> = { ...params }
 
     this.properties().forEach((property) => {
