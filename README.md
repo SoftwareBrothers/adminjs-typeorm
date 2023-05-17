@@ -34,7 +34,7 @@ import { Database, Resource } from '@adminjs/typeorm'
 import { validate } from 'class-validator'
 
 import AdminJS from 'adminjs'
-import * as AdminJSExpress from '@adminjs/express'
+import AdminJSExpress from '@adminjs/express'
 
 Resource.validate = validate
 AdminJS.registerAdapter({ Database, Resource })
