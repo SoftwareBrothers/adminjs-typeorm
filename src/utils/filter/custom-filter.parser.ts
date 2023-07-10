@@ -1,9 +1,31 @@
-import { FilterElement } from 'adminjs';
+import { FilterElement, flat, Filter } from 'adminjs';
 import { FilterParser } from './filter.types.js';
 
+// Raw filter payload:
+// {
+//   path: 'writeoff',
+//   property: undefined,
+//   value: {
+//     'custom.agentId.email': 'medz',
+//     'custom.agentId.id': 'se8tETxe2GXoQW-iqGjod',
+//     'custom.agentId.title': 'Seven',
+//     'custom.agentId.role': 'administrator'
+//   }
+// }
+// OR
+// {
+//   'custom.agentId.email': 'medz',
+// }
+
 const isCustomFilter = (filter: any) => filter?.custom;
-const isRawCustomFilter = (filter: FilterElement) =>
-  isCustomFilter(filter.value);
+const isRawCustomFilter = (filter: FilterElement) => {
+  const normalized: FilterElement = flat.unflatten(
+    flat.flatten(filter.value, { delimiter: flat.DELIMITER }),
+    { delimiter: flat.DELIMITER },
+  );
+
+  return isCustomFilter(normalized.value);
+};
 
 const isParserForType: FilterParser['isParserForType'] = (
   filter: FilterElement,
@@ -43,7 +65,9 @@ const parse: FilterParser['parse'] = (
  *     actions: {
  *         list: {
  *            before(request, context) {
- *               request.query['filters.YOUR_FILTER_KEY~~custom'] = In(1, 2, 3),
+ *               request.query['filters.YOUR_FILTER_KEY'] = {
+ *                  custom: In([1, 2, 3]),
+ *               },
  *            },
  *         }
  *     },
