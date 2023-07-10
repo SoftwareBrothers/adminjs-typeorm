@@ -1,4 +1,4 @@
-import { FilterElement, flat, Filter } from 'adminjs';
+import { FilterElement, flat } from 'adminjs';
 import { FilterParser } from './filter.types.js';
 
 // Raw filter payload:
@@ -12,12 +12,10 @@ import { FilterParser } from './filter.types.js';
 //     'custom.agentId.role': 'administrator'
 //   }
 // }
-// OR
-// {
-//   'custom.agentId.email': 'medz',
-// }
 
-const isCustomFilter = (filter: any) => filter?.custom;
+const CUSTOM_KEY = 'custom';
+
+const isCustomFilter = (filter: any) => filter[CUSTOM_KEY];
 const isRawCustomFilter = (filter: FilterElement) => {
   const normalized: FilterElement = flat.unflatten(
     flat.flatten(filter.value, { delimiter: flat.DELIMITER }),
@@ -33,10 +31,15 @@ const isParserForType: FilterParser['isParserForType'] = (
 
 const readFilterValue = (filter: FilterElement): any => {
   if (isRawCustomFilter(filter)) {
-    return filter.value['custom'];
+    const normalized = flat.unflatten(
+      flat.flatten(filter.value, { delimiter: flat.DELIMITER }),
+      { delimiter: flat.DELIMITER },
+    );
+
+    return normalized[CUSTOM_KEY];
   }
 
-  return filter['custom'];
+  return filter[CUSTOM_KEY];
 };
 
 const parse: FilterParser['parse'] = (
@@ -66,7 +69,7 @@ const parse: FilterParser['parse'] = (
  *     actions: {
  *         list: {
  *            before(request, context) {
- *               request.query[`filters.YOUR_FILTER_KEY${PARAM_SEPARATOR}custom`] = In([1, 2, 3]),
+ *               request.query[`filters.YOUR_FILTER_KEY~~custom`] = In([1, 2, 3]),
  *               return request;
  *            },
  *         }
