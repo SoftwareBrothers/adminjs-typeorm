@@ -20,7 +20,7 @@ const isParserForType: FilterParser['isParserForType'] = (
 
 const readFilterValue = (filter: FilterElement): any => {
   if (isRawCustomFilter(filter)) {
-    return Function.call(filter.value);
+    return (filter.value as any)();
   }
 
   return filter[CUSTOM_KEY];
