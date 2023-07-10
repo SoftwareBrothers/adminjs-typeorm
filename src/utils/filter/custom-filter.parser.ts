@@ -24,7 +24,7 @@ const isRawCustomFilter = (filter: FilterElement) => {
     { delimiter: flat.DELIMITER },
   );
 
-  return isCustomFilter(normalized.value);
+  return isCustomFilter(normalized);
 };
 
 const isParserForType: FilterParser['isParserForType'] = (
@@ -60,14 +60,14 @@ const parse: FilterParser['parse'] = (
  * ### In AdminJS raw filter will be passed as:
  *
  * ```ts
+ * import {PARAM_SEPARATOR} from 'adminks';
  * const testResource = {
  *     resource: YOUR_RESOURCE,
  *     actions: {
  *         list: {
  *            before(request, context) {
- *               request.query['filters.YOUR_FILTER_KEY'] = {
- *                  custom: In([1, 2, 3]),
- *               },
+ *               request.query[`filters.YOUR_FILTER_KEY${PARAM_SEPARATOR}custom`] = In([1, 2, 3]),
+ *               return request;
  *            },
  *         }
  *     },
