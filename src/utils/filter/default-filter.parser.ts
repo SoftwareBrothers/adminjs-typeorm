@@ -1,4 +1,4 @@
-import { Like, Raw } from 'typeorm'
+import { ILike, Raw } from 'typeorm'
 import { Property } from '../../Property.js'
 import { FilterParser } from './filter.types.js'
 
@@ -18,6 +18,6 @@ export const DefaultParser: FilterParser = {
         }),
       }
     }
-    return { filterKey: fieldKey, filterValue: Like(`%${filter.value}%`) }
+    return { filterKey: fieldKey, filterValue: ILike(`%${filter.value}%`) }
   },
 }
