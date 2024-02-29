@@ -20,7 +20,7 @@
  * import { Database, Resource } from '@adminjs/typeorm';
  * import AdminJS from 'adminjs'
  *
- * AdminJS.registerAdapter(TypeOrmAdapter);
+ * AdminJS.registerAdapter({ Database, Resource });
  *
  * //...
  * ```
