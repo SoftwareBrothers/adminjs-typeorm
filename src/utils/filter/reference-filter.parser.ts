@@ -5,9 +5,9 @@ import { FilterParser } from './filter.types.js'
 export const ReferenceParser: FilterParser = {
   isParserForType: (filter) => filter.property.type() === 'reference',
   parse: (filter: FilterElement) => {
-    const [column] = (filter.property as Property).column.propertyPath.split(
+    const [column, pk] = (filter.property as Property).column.propertyPath.split(
       '.',
     )
-    return { filterKey: column, filterValue: filter.value as any }
+    return { filterKey: column, filterValue: { [pk]: filter.value } as any }
   },
 }
