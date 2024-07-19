@@ -22,7 +22,7 @@ export enum CarType {
 @Entity()
 export class Car extends BaseEntity {
   @PrimaryGeneratedColumn()
-  public carId: number
+  public id: number
 
   @Column()
   @IsDefined()
