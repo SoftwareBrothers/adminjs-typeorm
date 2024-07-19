@@ -1,19 +1,21 @@
-import 'reflect-metadata'
-import { createConnection } from 'typeorm'
-import express from 'express'
-import AdminJS from 'adminjs'
 import { buildRouter } from '@adminjs/express'
-import * as TypeormAdapter from '@adminjs/typeorm'
-import { User } from './entity/User'
-import { Car } from './entity/Car'
-import { Seller } from './entity/Seller'
+import { Database, Resource } from '@adminjs/typeorm'
+import AdminJS from 'adminjs'
+import express from 'express'
+import 'reflect-metadata'
+import { DataSource } from 'typeorm'
+import { dataSourceOptions } from '../ormconfig.js'
+import { Car } from './entities/Car.js'
+import { Seller } from './entities/Seller.js'
+import { User } from './entities/User.js'
+import { BrandSchema } from './schemas/brand.schema.js'
 
-AdminJS.registerAdapter(TypeormAdapter)
+AdminJS.registerAdapter({ Database, Resource })
 
 const PORT = 3000
 
 const run = async () => {
-  await createConnection()
+  const dataSource = await new DataSource(dataSourceOptions).initialize()
   const app = express()
   const admin = new AdminJS({
     resources: [{
@@ -37,7 +39,10 @@ const run = async () => {
           },
         },
       },
-    }, Seller],
+    }, Seller, {
+      schema: BrandSchema,
+      dataSource,
+    }],
   })
   const router = buildRouter(admin)
 
