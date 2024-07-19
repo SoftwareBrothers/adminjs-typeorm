@@ -1,6 +1,6 @@
-import { BaseEntity, Entity, PrimaryGeneratedColumn, Column, RelationId, ManyToOne } from 'typeorm'
-import { User } from './User'
-import { Seller } from './Seller'
+import { BaseEntity, Entity, PrimaryGeneratedColumn, Column, RelationId, ManyToOne, Relation } from 'typeorm'
+import { User } from './User.js'
+import { Seller } from './Seller.js'
 
 @Entity()
 export class Car extends BaseEntity {
@@ -17,10 +17,10 @@ export class Car extends BaseEntity {
     meta: any
 
   @ManyToOne((type) => User, (user) => user.cars)
-    owner: User
+    owner: Relation<User>
 
   @ManyToOne((type) => Seller, (seller) => seller.cars)
-    seller: User
+    seller: Relation<User>
 
   // in order be able to fetch resources in adminjs - we have to have id available
   @RelationId((car: Car) => car.owner)
