@@ -23,9 +23,9 @@ describe('Property', () => {
 
   describe('#name', () => {
     it('returns a name of the property', () => {
-      const column = columns.find((c) => c.propertyName === 'carId') as ColumnMetadata
+      const column = columns.find((c) => c.propertyName === 'id') as ColumnMetadata
 
-      expect(new Property(column).name()).to.equal('carId')
+      expect(new Property(column).name()).to.equal('id')
     })
   })
 
@@ -45,7 +45,7 @@ describe('Property', () => {
 
   describe('#isId', () => {
     it('returns true for primary key', () => {
-      const column = columns.find((c) => c.propertyName === 'carId') as ColumnMetadata
+      const column = columns.find((c) => c.propertyName === 'id') as ColumnMetadata
 
       expect(new Property(column).isId()).to.equal(true)
     })
@@ -59,7 +59,7 @@ describe('Property', () => {
 
   describe('#isEditable', () => {
     it('returns false for id field', async () => {
-      const column = columns.find((c) => c.propertyName === 'carId') as ColumnMetadata
+      const column = columns.find((c) => c.propertyName === 'id') as ColumnMetadata
 
       expect(new Property(column).isEditable()).to.equal(false)
     })
