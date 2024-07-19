@@ -1,7 +1,7 @@
-import { BaseEntity, DataSource } from 'typeorm'
+import { DataSource } from 'typeorm'
 
 import { BaseDatabase } from 'adminjs'
-import { Resource } from './Resource.js'
+import { Resource, ResourceType } from './Resource.js'
 
 export class Database extends BaseDatabase {
   public constructor(public readonly dataSource: DataSource) {
@@ -12,7 +12,9 @@ export class Database extends BaseDatabase {
     const resources: Array<Resource> = []
     // eslint-disable-next-line no-restricted-syntax
     for (const entityMetadata of this.dataSource.entityMetadatas) {
-      resources.push(new Resource(entityMetadata.target as typeof BaseEntity))
+      resources.push(
+        new Resource(entityMetadata.target as ResourceType),
+      )
     }
 
     return resources
