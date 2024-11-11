@@ -31,7 +31,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/SoftwareBrothers/adminjs-typeorm.git"
+    "url": "git+https://github.com/524H0003/adminjs-typeorm.git"
   },
   "husky": {
     "hooks": {
