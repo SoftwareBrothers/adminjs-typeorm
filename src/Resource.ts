@@ -11,7 +11,7 @@ type ParamsType = Record<string, any>;
 export class Resource extends BaseResource {
   public static validate: any
 
-  private model: typeof BaseEntity
+  public model: typeof BaseEntity
 
   private propsObject: Record<string, Property> = {}
 
