@@ -7,7 +7,7 @@
       "types": "./lib/index.d.ts"
     }
   },
-  "version": "5.0.1",
+  "version": "1.0.0-beta.1",
   "description": "TypeORM adapter for AdminJS",
   "keywords": [
     "typeorm",
@@ -31,7 +31,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/SoftwareBrothers/adminjs-typeorm.git"
+    "url": "git+https://github.com/524H0003/adminjs-typeorm.git"
   },
   "husky": {
     "hooks": {
