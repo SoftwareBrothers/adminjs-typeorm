@@ -7,7 +7,7 @@
       "types": "./lib/index.d.ts"
     }
   },
-  "version": "5.0.1",
+  "version": "1.0.0-beta.1",
   "description": "TypeORM adapter for AdminJS",
   "keywords": [
     "typeorm",
