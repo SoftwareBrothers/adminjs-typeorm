@@ -1,5 +1,5 @@
 {
-  "name": "@adminjs/typeorm",
+  "name": "@524H0003/adminjs-typeorm",
   "type": "module",
   "exports": {
     ".": {
